@@ -20,15 +20,17 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
             {props.required && <span className="text-red-500 ml-1">*</span>}
           </label>
         )}
-        <div className="relative">
+        <motion.div 
+          className="relative"
+          whileFocus={{ scale: 1.01 }}
+        >
           {icon && (
             <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
               {icon}
             </div>
           )}
-          <motion.input
+          <input
             ref={ref}
-            whileFocus={{ scale: 1.01 }}
             className={cn(
               'w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400',
               'focus:outline-none focus:border-orange-500 focus:bg-white/15 transition-all',
@@ -48,7 +50,7 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
               {error}
             </motion.p>
           )}
-        </div>
+        </motion.div>
       </div>
     )
   }
