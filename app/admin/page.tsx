@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { 
   Lock, Users, Download, Trophy, Gamepad2, 
-  Zap, LogOut, RefreshCw, Eye 
+  Zap, LogOut, RefreshCw
 } from 'lucide-react'
 import { PUBGTeam, FreeFireTeam, DatabaseStats } from '@/types'
 
@@ -27,6 +27,7 @@ export default function AdminPage() {
 
   useEffect(() => {
     checkAuth()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const checkAuth = async () => {
@@ -36,7 +37,7 @@ export default function AdminPage() {
         setIsLoggedIn(true)
         loadData()
       }
-    } catch (error) {
+    } catch {
       console.log('Not authenticated')
     }
   }
@@ -60,7 +61,7 @@ export default function AdminPage() {
         const data = await response.json()
         setError(data.error || 'Invalid credentials')
       }
-    } catch (error) {
+    } catch {
       setError('Login failed. Please try again.')
     } finally {
       setLoading(false)
@@ -89,7 +90,7 @@ export default function AdminPage() {
         const statsData = await statsRes.json()
         setStats(statsData)
       }
-    } catch (error) {
+    } catch {
       console.error('Failed to load data')
     }
   }
@@ -108,7 +109,7 @@ export default function AdminPage() {
         window.URL.revokeObjectURL(url)
         document.body.removeChild(a)
       }
-    } catch (error) {
+    } catch {
       console.error('Export failed')
     }
   }
