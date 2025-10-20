@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production'
+const JWT_SECRET = process.env.JWT_SECRET || 'tournament-registration-secure-jwt-key-2024'
 const ADMIN_USERNAME = 'admin'
 const ADMIN_PASSWORD_HASH = bcrypt.hashSync('admin123', 10) // Change this password!
 

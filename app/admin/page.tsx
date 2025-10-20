@@ -1,124 +1,132 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { 
-  Lock, Users, Download, Trophy, Gamepad2, 
-  Zap, LogOut, RefreshCw
-} from 'lucide-react'
-import { PUBGTeam, FreeFireTeam, DatabaseStats } from '@/types'
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import {
+  Lock,
+  Users,
+  Download,
+  Trophy,
+  Gamepad2,
+  Zap,
+  LogOut,
+  RefreshCw,
+} from "lucide-react";
+import { PUBGTeam, FreeFireTeam, DatabaseStats } from "@/types";
 
 export default function AdminPage() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  
-  const [activeTab, setActiveTab] = useState<'pubg' | 'freefire'>('pubg')
-  const [pubgTeams, setPubgTeams] = useState<PUBGTeam[]>([])
-  const [freeFireTeams, setFreeFireTeams] = useState<FreeFireTeam[]>([])
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const [activeTab, setActiveTab] = useState<"pubg" | "freefire">("pubg");
+  const [pubgTeams, setPubgTeams] = useState<PUBGTeam[]>([]);
+  const [freeFireTeams, setFreeFireTeams] = useState<FreeFireTeam[]>([]);
   const [stats, setStats] = useState<DatabaseStats>({
     pubgTeams: 0,
     freeFireTeams: 0,
     pubgSlots: 25,
     freeFireSlots: 12,
-  })
+  });
 
   useEffect(() => {
-    checkAuth()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+    checkAuth();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const checkAuth = async () => {
     try {
-      const res = await fetch('/api/admin/pubg-teams')
+      const res = await fetch("/api/admin/pubg-teams");
       if (res.ok) {
-        setIsLoggedIn(true)
-        loadData()
+        setIsLoggedIn(true);
+        loadData();
       }
     } catch {
-      console.log('Not authenticated')
+      console.log("Not authenticated");
     }
-  }
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setError('')
+    e.preventDefault();
+    setLoading(true);
+    setError("");
 
     try {
-      const response = await fetch('/api/admin/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
-      })
+      });
 
       if (response.ok) {
-        setIsLoggedIn(true)
-        loadData()
+        setIsLoggedIn(true);
+        loadData();
       } else {
-        const data = await response.json()
-        setError(data.error || 'Invalid credentials')
+        const data = await response.json();
+        setError(data.error || "Invalid credentials");
       }
     } catch {
-      setError('Login failed. Please try again.')
+      setError("Login failed. Please try again.");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const loadData = async () => {
     try {
       const [pubgRes, ffRes, statsRes] = await Promise.all([
-        fetch('/api/admin/pubg-teams'),
-        fetch('/api/admin/freefire-teams'),
-        fetch('/api/stats'),
-      ])
+        fetch("/api/admin/pubg-teams"),
+        fetch("/api/admin/freefire-teams"),
+        fetch("/api/stats"),
+      ]);
 
       if (pubgRes.ok) {
-        const pubg = await pubgRes.json()
-        setPubgTeams(pubg)
+        const pubg = await pubgRes.json();
+        setPubgTeams(pubg);
       }
 
       if (ffRes.ok) {
-        const ff = await ffRes.json()
-        setFreeFireTeams(ff)
+        const ff = await ffRes.json();
+        setFreeFireTeams(ff);
       }
 
       if (statsRes.ok) {
-        const statsData = await statsRes.json()
-        setStats(statsData)
+        const statsData = await statsRes.json();
+        setStats(statsData);
       }
     } catch {
-      console.error('Failed to load data')
+      console.error("Failed to load data");
     }
-  }
+  };
 
-  const handleExport = async (game: 'pubg' | 'freefire') => {
+  const handleExport = async (game: "pubg" | "freefire") => {
     try {
-      const res = await fetch(`/api/admin/export/${game}`)
+      const res = await fetch(`/api/admin/export/${game}`);
       if (res.ok) {
-        const blob = await res.blob()
-        const url = window.URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = url
-        a.download = `${game.toUpperCase()}_Teams_${new Date().toISOString().split('T')[0]}.xlsx`
-        document.body.appendChild(a)
-        a.click()
-        window.URL.revokeObjectURL(url)
-        document.body.removeChild(a)
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${game.toUpperCase()}_Teams_${
+          new Date().toISOString().split("T")[0]
+        }.xlsx`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
       }
     } catch {
-      console.error('Export failed')
+      console.error("Export failed");
     }
-  }
+  };
 
   const handleLogout = () => {
-    setIsLoggedIn(false)
-    setUsername('')
-    setPassword('')
-  }
+    setIsLoggedIn(false);
+    setUsername("");
+    setPassword("");
+  };
 
   if (!isLoggedIn) {
     return (
@@ -170,7 +178,7 @@ export default function AdminPage() {
               disabled={loading}
               className="w-full py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-xl hover:from-orange-600 hover:to-red-600 transition-all disabled:opacity-50"
             >
-              {loading ? 'Logging in...' : 'Login'}
+              {loading ? "Logging in..." : "Login"}
             </button>
 
             <p className="text-gray-400 text-sm text-center mt-4">
@@ -179,12 +187,14 @@ export default function AdminPage() {
           </form>
         </motion.div>
       </div>
-    )
+    );
   }
 
-  const currentTeams = activeTab === 'pubg' ? pubgTeams : freeFireTeams
-  const yesVotes = currentTeams.filter(t => t.liveStreamVote === 'yes').length
-  const noVotes = currentTeams.filter(t => t.liveStreamVote === 'no').length
+  const currentTeams = activeTab === "pubg" ? pubgTeams : freeFireTeams;
+  const yesVotes = currentTeams.filter(
+    (t) => t.liveStreamVote === "yes"
+  ).length;
+  const noVotes = currentTeams.filter((t) => t.liveStreamVote === "no").length;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900">
@@ -195,7 +205,9 @@ export default function AdminPage() {
             <div className="flex items-center gap-3">
               <Trophy className="w-8 h-8 text-orange-500" />
               <div>
-                <h1 className="text-2xl font-bold text-white">Admin Dashboard</h1>
+                <h1 className="text-2xl font-bold text-white">
+                  Admin Dashboard
+                </h1>
                 <p className="text-gray-400 text-sm">Tournament Management</p>
               </div>
             </div>
@@ -224,7 +236,9 @@ export default function AdminPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-gradient-to-br from-orange-600/20 to-transparent border border-orange-500/30 rounded-xl p-6">
             <Gamepad2 className="w-10 h-10 text-orange-500 mb-3" />
-            <div className="text-3xl font-bold text-white mb-1">{stats.pubgTeams}</div>
+            <div className="text-3xl font-bold text-white mb-1">
+              {stats.pubgTeams}
+            </div>
             <div className="text-gray-400">PUBG Teams</div>
             <div className="text-sm text-orange-400 mt-2">
               {stats.pubgSlots - stats.pubgTeams} slots left
@@ -233,7 +247,9 @@ export default function AdminPage() {
 
           <div className="bg-gradient-to-br from-red-600/20 to-transparent border border-red-500/30 rounded-xl p-6">
             <Zap className="w-10 h-10 text-red-500 mb-3" />
-            <div className="text-3xl font-bold text-white mb-1">{stats.freeFireTeams}</div>
+            <div className="text-3xl font-bold text-white mb-1">
+              {stats.freeFireTeams}
+            </div>
             <div className="text-gray-400">Free Fire Teams</div>
             <div className="text-sm text-red-400 mt-2">
               {stats.freeFireSlots - stats.freeFireTeams} slots left
@@ -264,22 +280,22 @@ export default function AdminPage() {
         {/* Tabs */}
         <div className="flex gap-4 mb-6">
           <button
-            onClick={() => setActiveTab('pubg')}
+            onClick={() => setActiveTab("pubg")}
             className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all ${
-              activeTab === 'pubg'
-                ? 'bg-orange-500 text-white'
-                : 'bg-white/5 text-gray-400 hover:bg-white/10'
+              activeTab === "pubg"
+                ? "bg-orange-500 text-white"
+                : "bg-white/5 text-gray-400 hover:bg-white/10"
             }`}
           >
             <Gamepad2 className="w-5 h-5" />
             PUBG Mobile ({pubgTeams.length})
           </button>
           <button
-            onClick={() => setActiveTab('freefire')}
+            onClick={() => setActiveTab("freefire")}
             className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all ${
-              activeTab === 'freefire'
-                ? 'bg-red-500 text-white'
-                : 'bg-white/5 text-gray-400 hover:bg-white/10'
+              activeTab === "freefire"
+                ? "bg-red-500 text-white"
+                : "bg-white/5 text-gray-400 hover:bg-white/10"
             }`}
           >
             <Zap className="w-5 h-5" />
@@ -289,20 +305,29 @@ export default function AdminPage() {
 
         {/* Live Stream Votes */}
         <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6 mb-6">
-          <h3 className="text-xl font-bold text-white mb-4">Live Stream Voting Results</h3>
+          <h3 className="text-xl font-bold text-white mb-4">
+            Live Stream Voting Results
+          </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
-              <div className="text-2xl font-bold text-green-400 mb-1">{yesVotes}</div>
+              <div className="text-2xl font-bold text-green-400 mb-1">
+                {yesVotes}
+              </div>
               <div className="text-gray-300">Want Live Stream (Yes)</div>
             </div>
             <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4">
-              <div className="text-2xl font-bold text-red-400 mb-1">{noVotes}</div>
-              <div className="text-gray-300">Don't Want (No)</div>
+              <div className="text-2xl font-bold text-red-400 mb-1">
+                {noVotes}
+              </div>
+              <div className="text-gray-300">Don&apos;t Want (No)</div>
             </div>
           </div>
           <div className="mt-4 text-center">
             <span className="text-lg font-semibold text-white">
-              Result: {yesVotes > noVotes ? '✅ Live Stream on YouTube' : '❌ No Live Stream'}
+              Result:{" "}
+              {yesVotes > noVotes
+                ? "✅ Live Stream on YouTube"
+                : "❌ No Live Stream"}
             </span>
           </div>
         </div>
@@ -314,7 +339,7 @@ export default function AdminPage() {
             className="flex items-center gap-2 px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-xl transition-colors"
           >
             <Download className="w-5 h-5" />
-            Export {activeTab === 'pubg' ? 'PUBG' : 'Free Fire'} Teams to Excel
+            Export {activeTab === "pubg" ? "PUBG" : "Free Fire"} Teams to Excel
           </button>
         </div>
 
@@ -324,37 +349,64 @@ export default function AdminPage() {
             <table className="w-full">
               <thead className="bg-white/10">
                 <tr>
-                  <th className="px-4 py-3 text-left text-white font-semibold">S.No</th>
-                  <th className="px-4 py-3 text-left text-white font-semibold">Team Name</th>
-                  <th className="px-4 py-3 text-left text-white font-semibold">Leader</th>
-                  <th className="px-4 py-3 text-left text-white font-semibold">WhatsApp</th>
                   <th className="px-4 py-3 text-left text-white font-semibold">
-                    {activeTab === 'pubg' ? 'PUBG ID' : 'UID'}
+                    S.No
                   </th>
-                  <th className="px-4 py-3 text-left text-white font-semibold">Transaction ID</th>
-                  <th className="px-4 py-3 text-left text-white font-semibold">Live Vote</th>
-                  <th className="px-4 py-3 text-left text-white font-semibold">Registered</th>
+                  <th className="px-4 py-3 text-left text-white font-semibold">
+                    Team Name
+                  </th>
+                  <th className="px-4 py-3 text-left text-white font-semibold">
+                    Leader
+                  </th>
+                  <th className="px-4 py-3 text-left text-white font-semibold">
+                    WhatsApp
+                  </th>
+                  <th className="px-4 py-3 text-left text-white font-semibold">
+                    {activeTab === "pubg" ? "PUBG ID" : "UID"}
+                  </th>
+                  <th className="px-4 py-3 text-left text-white font-semibold">
+                    Transaction ID
+                  </th>
+                  <th className="px-4 py-3 text-left text-white font-semibold">
+                    Live Vote
+                  </th>
+                  <th className="px-4 py-3 text-left text-white font-semibold">
+                    Registered
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/10">
                 {currentTeams.map((team, index) => (
-                  <tr key={team.id} className="hover:bg-white/5 transition-colors">
+                  <tr
+                    key={team.id}
+                    className="hover:bg-white/5 transition-colors"
+                  >
                     <td className="px-4 py-3 text-gray-300">{index + 1}</td>
-                    <td className="px-4 py-3 text-white font-semibold">{team.teamName}</td>
-                    <td className="px-4 py-3 text-gray-300">{team.leaderName}</td>
-                    <td className="px-4 py-3 text-gray-300">{team.leaderWhatsApp}</td>
+                    <td className="px-4 py-3 text-white font-semibold">
+                      {team.teamName}
+                    </td>
                     <td className="px-4 py-3 text-gray-300">
-                      {activeTab === 'pubg' 
-                        ? (team as PUBGTeam).leaderPUBGId 
+                      {team.leaderName}
+                    </td>
+                    <td className="px-4 py-3 text-gray-300">
+                      {team.leaderWhatsApp}
+                    </td>
+                    <td className="px-4 py-3 text-gray-300">
+                      {activeTab === "pubg"
+                        ? (team as PUBGTeam).leaderPUBGId
                         : (team as FreeFireTeam).leaderUID}
                     </td>
-                    <td className="px-4 py-3 text-gray-300">{team.transactionId}</td>
+                    <td className="px-4 py-3 text-gray-300">
+                      {team.transactionId}
+                    </td>
                     <td className="px-4 py-3">
-                      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                        team.liveStreamVote === 'yes'
-                          ? 'bg-green-500/20 text-green-400'
-                          : 'bg-red-500/20 text-red-400'
-                      }`}>
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                          team.liveStreamVote === "yes"
+                            ? "bg-green-500/20 text-green-400"
+                            : "bg-red-500/20 text-red-400"
+                        }`}
+                      >
                         {team.liveStreamVote.toUpperCase()}
                       </span>
                     </td>
@@ -375,5 +427,5 @@ export default function AdminPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
