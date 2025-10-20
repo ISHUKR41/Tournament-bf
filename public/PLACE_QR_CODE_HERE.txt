@@ -1,0 +1,15 @@
+**⚠️ ACTION REQUIRED: Add Payment QR Code**
+
+Please save the QR code image you provided in your message as:
+`payment-qr.png`
+
+in this folder (public/).
+
+The QR code should be the Google Pay QR code image you shared.
+
+Steps:
+1. Right-click on the QR code image in the chat
+2. Save it as "payment-qr.png"  
+3. Copy it to: C:\Users\ISHU\OneDrive\Desktop\TOURNAMENT\public\
+
+Once added, the website will display the QR code on both tournament registration pages.
