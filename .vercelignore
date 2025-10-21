@@ -1,5 +1,5 @@
 # Vercel Ignore File
-# Files and directories to ignore during Vercel deployment
+# Only ignore specific data files, not entire folders
 
 # Local environment files
 .env.local
@@ -15,9 +15,9 @@ yarn-error.log*
 coverage/
 .nyc_output/
 
-# Local data (will be recreated in /tmp on Vercel)
-data/
-exports/
+# Local data files only (not the folder structure)
+data/*.json
+exports/*.xlsx
 
 # IDE
 .vscode/
@@ -29,9 +29,3 @@ exports/
 # OS
 .DS_Store
 Thumbs.db
-
-# Documentation (optional - comment out if you want to include)
-# README.md
-# DEPLOYMENT_READY.md
-# VERCEL_DEPLOYMENT_GUIDE.md
-# DEPLOY_NOW.md
