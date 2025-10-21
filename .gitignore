@@ -35,8 +35,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# data folder (ephemeral on Vercel)
+# Keep data and exports folders but ignore contents
 /data/*.json
-
-# exports folder
-/exports
+/exports/*.xlsx
