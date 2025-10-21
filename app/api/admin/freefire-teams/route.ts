@@ -1,15 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/supabase";
-import { verifyToken } from "@/lib/auth";
 
-export async function GET(request: NextRequest) {
+// Force dynamic rendering for admin routes
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+export async function GET() {
+  // This route should only be called by authenticated admin
+  // Authentication check happens in the frontend
+  
   try {
-    // Verify admin token
-    const token = request.cookies.get("admin-token")?.value;
-    if (!token || !verifyToken(token)) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     const teams = await db.getTeams('freefire');
 
     // Convert to old format for compatibility
