@@ -9,8 +9,6 @@ import {
   DollarSign,
   Clock,
   Award,
-  MapPin,
-  Calendar,
 } from "lucide-react";
 import { Navbar } from "../components/navbar";
 import { useStats } from "../hooks/useStats";
