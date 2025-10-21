@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { saveFreeFireTeam, hasAvailableSlots } from '@/lib/database'
-import { FreeFireTeam } from '@/types'
-import { freeFireRegistrationSchema } from '@/lib/validations'
+import { saveFreeFireTeam, hasAvailableSlots } from '../../../../../lib/database'
+import { FreeFireTeam } from '../../../../../types'
+import { freeFireRegistrationSchema } from '../../../../../lib/validations'
 import { ZodError } from 'zod'
-import { invalidateCache } from '@/lib/cache'
+import { invalidateCache } from '../../../../../lib/cache'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'

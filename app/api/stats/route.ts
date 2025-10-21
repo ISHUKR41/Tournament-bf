@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
-import { getStats } from '@/lib/database'
-import { getCachedStats, setCachedStats } from '@/lib/cache'
+import { getStats } from '../../../lib/database'
+import { getCachedStats, setCachedStats } from '../../../lib/cache'
 
 // Force dynamic rendering and disable caching for real-time updates
 export const dynamic = 'force-dynamic'

@@ -1,17 +1,17 @@
-'use client'
+"use client";
 
-import { motion } from 'framer-motion'
-import { Users, AlertCircle } from 'lucide-react'
-import { useStats } from '@/hooks/useStats'
-import { cn } from '@/lib/utils'
+import { motion } from "framer-motion";
+import { Users, AlertCircle } from "lucide-react";
+import { useStats } from "../hooks/useStats";
+import { cn } from "../lib/utils";
 
 interface SlotsCounterProps {
-  game: 'pubg' | 'freefire'
-  variant?: 'default' | 'compact'
+  game: "pubg" | "freefire";
+  variant?: "default" | "compact";
 }
 
-export function SlotsCounter({ game, variant = 'default' }: SlotsCounterProps) {
-  const { data: stats, isLoading } = useStats()
+export function SlotsCounter({ game, variant = "default" }: SlotsCounterProps) {
+  const { data: stats, isLoading } = useStats();
 
   if (isLoading || !stats) {
     return (
@@ -19,50 +19,50 @@ export function SlotsCounter({ game, variant = 'default' }: SlotsCounterProps) {
         <div className="h-8 bg-white/20 rounded w-32 mb-2"></div>
         <div className="h-4 bg-white/20 rounded w-24"></div>
       </div>
-    )
+    );
   }
 
-  const filled = game === 'pubg' ? stats.pubgTeams : stats.freeFireTeams
-  const total = game === 'pubg' ? stats.pubgSlots : stats.freeFireSlots
-  const remaining = total - filled
-  const percentage = (filled / total) * 100
-  const isFull = remaining <= 0
-  const isAlmostFull = remaining <= 3 && remaining > 0
+  const filled = game === "pubg" ? stats.pubgTeams : stats.freeFireTeams;
+  const total = game === "pubg" ? stats.pubgSlots : stats.freeFireSlots;
+  const remaining = total - filled;
+  const percentage = (filled / total) * 100;
+  const isFull = remaining <= 0;
+  const isAlmostFull = remaining <= 3 && remaining > 0;
 
   const colors = {
     pubg: {
-      gradient: 'from-orange-600/20 to-red-600/20',
-      border: 'border-orange-500/50',
-      text: 'text-orange-500',
-      progress: 'from-orange-500 to-red-500',
+      gradient: "from-orange-600/20 to-red-600/20",
+      border: "border-orange-500/50",
+      text: "text-orange-500",
+      progress: "from-orange-500 to-red-500",
     },
     freefire: {
-      gradient: 'from-red-600/20 to-pink-600/20',
-      border: 'border-red-500/50',
-      text: 'text-red-500',
-      progress: 'from-red-500 to-pink-500',
+      gradient: "from-red-600/20 to-pink-600/20",
+      border: "border-red-500/50",
+      text: "text-red-500",
+      progress: "from-red-500 to-pink-500",
     },
-  }
+  };
 
-  const color = colors[game]
+  const color = colors[game];
 
-  if (variant === 'compact') {
+  if (variant === "compact") {
     return (
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         className={cn(
-          'inline-flex items-center gap-2 px-4 py-2 rounded-full border backdrop-blur-sm',
+          "inline-flex items-center gap-2 px-4 py-2 rounded-full border backdrop-blur-sm",
           `bg-gradient-to-r ${color.gradient} ${color.border}`
         )}
       >
-        <Users className={cn('w-4 h-4', color.text)} />
+        <Users className={cn("w-4 h-4", color.text)} />
         <span className="text-white font-semibold">
           {remaining} / {total}
         </span>
         <span className="text-gray-300 text-sm">slots left</span>
       </motion.div>
-    )
+    );
   }
 
   return (
@@ -70,13 +70,13 @@ export function SlotsCounter({ game, variant = 'default' }: SlotsCounterProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className={cn(
-        'bg-gradient-to-br backdrop-blur-sm border rounded-2xl p-6',
+        "bg-gradient-to-br backdrop-blur-sm border rounded-2xl p-6",
         `${color.gradient} ${color.border}`
       )}
     >
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <Users className={cn('w-6 h-6', color.text)} />
+          <Users className={cn("w-6 h-6", color.text)} />
           <span className="text-gray-300 font-medium">Registration Status</span>
         </div>
         {isAlmostFull && !isFull && (
@@ -107,9 +107,13 @@ export function SlotsCounter({ game, variant = 'default' }: SlotsCounterProps) {
 
         <div className="text-sm text-gray-300">
           {isFull ? (
-            <span className="text-red-400 font-semibold">❌ Registration Closed</span>
+            <span className="text-red-400 font-semibold">
+              ❌ Registration Closed
+            </span>
           ) : isAlmostFull ? (
-            <span className="text-yellow-400 font-semibold">⚡ Only {remaining} slots remaining!</span>
+            <span className="text-yellow-400 font-semibold">
+              ⚡ Only {remaining} slots remaining!
+            </span>
           ) : (
             <span>Slots Available</span>
           )}
@@ -120,8 +124,8 @@ export function SlotsCounter({ game, variant = 'default' }: SlotsCounterProps) {
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${percentage}%` }}
-            transition={{ duration: 1, ease: 'easeOut' }}
-            className={cn('absolute h-full bg-gradient-to-r', color.progress)}
+            transition={{ duration: 1, ease: "easeOut" }}
+            className={cn("absolute h-full bg-gradient-to-r", color.progress)}
           />
         </div>
 
@@ -135,7 +139,7 @@ export function SlotsCounter({ game, variant = 'default' }: SlotsCounterProps) {
       {isFull && (
         <motion.div
           initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: 'auto' }}
+          animate={{ opacity: 1, height: "auto" }}
           className="mt-4 pt-4 border-t border-white/10"
         >
           <p className="text-sm text-gray-300 text-center">
@@ -144,5 +148,5 @@ export function SlotsCounter({ game, variant = 'default' }: SlotsCounterProps) {
         </motion.div>
       )}
     </motion.div>
-  )
+  );
 }

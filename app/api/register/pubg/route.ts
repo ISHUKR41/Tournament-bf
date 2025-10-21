@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { savePUBGTeam, hasAvailableSlots } from '@/lib/database'
-import { PUBGTeam } from '@/types'
-import { pubgRegistrationSchema } from '@/lib/validations'
+import { savePUBGTeam, hasAvailableSlots } from '../../../../../lib/database'
+import { PUBGTeam } from '../../../../../types'
+import { pubgRegistrationSchema } from '../../../../../lib/validations'
 import { ZodError } from 'zod'
-import { invalidateCache } from '@/lib/cache'
+import { invalidateCache } from '../../../../../lib/cache'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'

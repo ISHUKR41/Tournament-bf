@@ -15,9 +15,9 @@ import {
   CheckCircle,
   Zap,
 } from "lucide-react";
-import { Navbar } from "@/components/navbar";
-import { useStats } from "@/hooks/useStats";
-import { SuccessConfetti } from "@/components/success-confetti";
+import { Navbar } from "../../components/navbar";
+import { useStats } from "../../hooks/useStats";
+import { SuccessConfetti } from "../../components/success-confetti";
 
 export default function FreeFirePage() {
   const { data: stats } = useStats();

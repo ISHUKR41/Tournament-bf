@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyToken } from '@/lib/auth'
-import { getPUBGTeams } from '@/lib/database'
-import { exportPUBGToExcel } from '@/lib/excel'
+import { verifyToken } from '../../../../lib/auth'
+import { getPUBGTeams } from '../../../../lib/database'
+import { exportPUBGToExcel } from '../../../../lib/excel'
 
 export async function GET(request: NextRequest) {
   try {

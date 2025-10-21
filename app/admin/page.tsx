@@ -12,7 +12,7 @@ import {
   LogOut,
   RefreshCw,
 } from "lucide-react";
-import { PUBGTeam, FreeFireTeam, DatabaseStats } from "@/types";
+import { PUBGTeam, FreeFireTeam, DatabaseStats } from "../../types";
 
 export default function AdminPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
