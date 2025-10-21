@@ -1,42 +1,48 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { saveFreeFireTeam, hasAvailableSlots } from '../../../../../lib/database'
-import { FreeFireTeam } from '../../../../../types'
-import { freeFireRegistrationSchema } from '../../../../../lib/validations'
-import { ZodError } from 'zod'
-import { invalidateCache } from '../../../../../lib/cache'
+import { NextRequest, NextResponse } from "next/server";
+import {
+  saveFreeFireTeam,
+  hasAvailableSlots,
+} from "../../../../../lib/database";
+import { FreeFireTeam } from "../../../../../types";
+import { freeFireRegistrationSchema } from "../../../../../lib/validations";
+import { ZodError } from "zod";
+import { invalidateCache } from "../../../../../lib/cache";
 
 // Force dynamic rendering
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
+    const body = await request.json();
 
     // Check if slots are available
-    if (!hasAvailableSlots('freefire')) {
+    if (!hasAvailableSlots("freefire")) {
       return NextResponse.json(
-        { error: 'All slots are filled. Registration closed.' },
+        { error: "All slots are filled. Registration closed." },
         { status: 400 }
-      )
+      );
     }
 
     // Validate with Zod schema
     try {
-      freeFireRegistrationSchema.parse(body)
+      freeFireRegistrationSchema.parse(body);
     } catch (error) {
       if (error instanceof ZodError) {
-        const firstError = error.errors[0]
+        const firstError = error.errors[0];
         return NextResponse.json(
-          { 
+          {
             error: firstError.message,
-            field: firstError.path.join('.'),
-            details: error.errors.map(e => ({ field: e.path.join('.'), message: e.message }))
+            field: firstError.path.join("."),
+            details: error.errors.map((e) => ({
+              field: e.path.join("."),
+              message: e.message,
+            })),
           },
           { status: 400 }
-        )
+        );
       }
-      throw error
+      throw error;
     }
 
     const team: FreeFireTeam = {
@@ -53,30 +59,31 @@ export async function POST(request: NextRequest) {
       liveStreamVote: body.liveStreamVote,
       agreedToTerms: body.agreedToTerms,
       registeredAt: new Date().toISOString(),
-    }
+    };
 
-    const saved = saveFreeFireTeam(team)
+    const saved = saveFreeFireTeam(team);
 
     if (saved) {
       // Invalidate cache for real-time updates
-      invalidateCache()
-      
+      invalidateCache();
+
       return NextResponse.json({
         success: true,
-        message: '🔥 Team registered successfully! Room ID will be shared on WhatsApp.',
+        message:
+          "🔥 Team registered successfully! Room ID will be shared on WhatsApp.",
         teamId: team.id,
-      })
+      });
     } else {
       return NextResponse.json(
-        { error: 'Failed to save team' },
+        { error: "Failed to save team" },
         { status: 500 }
-      )
+      );
     }
   } catch (error) {
-    console.error('Registration error:', error)
+    console.error("Registration error:", error);
     return NextResponse.json(
-      { error: 'Internal server error. Please try again.' },
+      { error: "Internal server error. Please try again." },
       { status: 500 }
-    )
+    );
   }
 }
