@@ -9,10 +9,13 @@ export async function GET() {
     const stats = await db.getStats()
     
     if (!stats) {
-      return NextResponse.json(
-        { error: 'Unable to fetch stats' },
-        { status: 500 }
-      )
+      // Fallback to default stats if database not configured
+      return NextResponse.json({
+        pubgTeams: 0,
+        freeFireTeams: 0,
+        pubgSlots: 25,
+        freeFireSlots: 12,
+      })
     }
 
     return NextResponse.json({
@@ -23,9 +26,12 @@ export async function GET() {
     })
   } catch (error) {
     console.error('Stats API error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    // Return default stats on error
+    return NextResponse.json({
+      pubgTeams: 0,
+      freeFireTeams: 0,
+      pubgSlots: 25,
+      freeFireSlots: 12,
+    })
   }
 }
