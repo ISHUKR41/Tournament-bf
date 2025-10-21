@@ -1,12 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import {
-  saveFreeFireTeam,
-  hasAvailableSlots,
-} from "@/lib/database";
-import { FreeFireTeam } from "@/types";
+import { db } from "@/lib/supabase";
 import { freeFireRegistrationSchema } from "@/lib/validations";
 import { ZodError } from "zod";
-import { invalidateCache } from "@/lib/cache";
 
 // Force dynamic rendering
 export const dynamic = "force-dynamic";
@@ -15,14 +10,6 @@ export const revalidate = 0;
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-
-    // Check if slots are available
-    if (!hasAvailableSlots("freefire")) {
-      return NextResponse.json(
-        { error: "All slots are filled. Registration closed." },
-        { status: 400 }
-      );
-    }
 
     // Validate with Zod schema
     try {
@@ -45,38 +32,36 @@ export async function POST(request: NextRequest) {
       throw error;
     }
 
-    const team: FreeFireTeam = {
-      id: `FF-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      teamName: body.teamName,
-      leaderName: body.leaderName,
-      leaderWhatsApp: body.leaderWhatsApp,
-      leaderUID: body.leaderUID,
-      player2: body.player2,
-      player3: body.player3,
-      player4: body.player4,
-      paymentScreenshot: body.paymentScreenshot,
-      transactionId: body.transactionId,
-      liveStreamVote: body.liveStreamVote,
-      agreedToTerms: body.agreedToTerms,
-      registeredAt: new Date().toISOString(),
-    };
+    // Register team in Supabase
+    const result = await db.registerTeam({
+      game: 'freefire',
+      team_name: body.teamName,
+      leader_name: body.leaderName,
+      leader_whatsapp: body.leaderWhatsApp,
+      leader_game_id: body.leaderUID,
+      player2_name: body.player2.name,
+      player2_game_id: body.player2.gameId,
+      player3_name: body.player3.name,
+      player3_game_id: body.player3.gameId,
+      player4_name: body.player4.name,
+      player4_game_id: body.player4.gameId,
+      payment_screenshot: body.paymentScreenshot,
+      transaction_id: body.transactionId,
+      live_stream_vote: body.liveStreamVote,
+      agreed_to_terms: body.agreedToTerms,
+    });
 
-    const saved = saveFreeFireTeam(team);
-
-    if (saved) {
-      // Invalidate cache for real-time updates
-      invalidateCache();
-
+    if (result.success) {
       return NextResponse.json({
         success: true,
         message:
           "🔥 Team registered successfully! Room ID will be shared on WhatsApp.",
-        teamId: team.id,
+        teamId: result.data?.id,
       });
     } else {
       return NextResponse.json(
-        { error: "Failed to save team" },
-        { status: 500 }
+        { error: result.error || "Failed to save team" },
+        { status: 400 }
       );
     }
   } catch (error) {

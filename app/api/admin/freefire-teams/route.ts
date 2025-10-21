@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifyToken } from "../../../../lib/auth";
-import { getFreeFireTeams } from "../../../../lib/database";
+import { db } from "@/lib/supabase";
+import { verifyToken } from "@/lib/auth";
 
 export async function GET(request: NextRequest) {
   try {
@@ -10,9 +10,28 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const teams = getFreeFireTeams();
-    return NextResponse.json(teams);
-  } catch {
+    const teams = await db.getTeams('freefire');
+
+    // Convert to old format for compatibility
+    const formattedTeams = teams.map(team => ({
+      id: team.id,
+      teamName: team.team_name,
+      leaderName: team.leader_name,
+      leaderWhatsApp: team.leader_whatsapp,
+      leaderUID: team.leader_game_id,
+      player2: { name: team.player2_name, gameId: team.player2_game_id },
+      player3: { name: team.player3_name, gameId: team.player3_game_id },
+      player4: { name: team.player4_name, gameId: team.player4_game_id },
+      paymentScreenshot: team.payment_screenshot,
+      transactionId: team.transaction_id,
+      liveStreamVote: team.live_stream_vote,
+      agreedToTerms: team.agreed_to_terms,
+      registeredAt: team.registered_at,
+    }));
+
+    return NextResponse.json(formattedTeams);
+  } catch (error) {
+    console.error("Error fetching Free Fire teams:", error);
     return NextResponse.json(
       { error: "Failed to fetch teams" },
       { status: 500 }

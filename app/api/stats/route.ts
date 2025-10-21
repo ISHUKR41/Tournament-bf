@@ -1,42 +1,31 @@
-import { NextResponse } from "next/server";
-import { getStats } from "../../../lib/database";
-import { getCachedStats, setCachedStats } from "../../../lib/cache";
+import { NextResponse } from 'next/server'
+import { db } from '@/lib/supabase'
 
-// Force dynamic rendering and disable caching for real-time updates
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 export async function GET() {
   try {
-    // Check cache first
-    const cached = getCachedStats();
-    if (cached) {
-      return NextResponse.json(cached, {
-        headers: {
-          "Cache-Control": "no-store, no-cache, must-revalidate",
-          Pragma: "no-cache",
-          Expires: "0",
-        },
-      });
+    const stats = await db.getStats()
+    
+    if (!stats) {
+      return NextResponse.json(
+        { error: 'Unable to fetch stats' },
+        { status: 500 }
+      )
     }
 
-    // Get fresh stats
-    const stats = getStats();
-
-    // Update cache
-    setCachedStats(stats);
-
-    return NextResponse.json(stats, {
-      headers: {
-        "Cache-Control": "no-store, no-cache, must-revalidate",
-        Pragma: "no-cache",
-        Expires: "0",
-      },
-    });
-  } catch {
+    return NextResponse.json({
+      pubgTeams: stats.pubg_teams,
+      freeFireTeams: stats.freefire_teams,
+      pubgSlots: stats.pubg_slots,
+      freeFireSlots: stats.freefire_slots,
+    })
+  } catch (error) {
+    console.error('Stats API error:', error)
     return NextResponse.json(
-      { error: "Failed to fetch stats" },
+      { error: 'Internal server error' },
       { status: 500 }
-    );
+    )
   }
 }
