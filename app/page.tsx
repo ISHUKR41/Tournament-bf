@@ -1,8 +1,9 @@
 'use client'
 
+import { useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { Trophy, Gamepad2, Users, Zap, Shield, Award, DollarSign, Clock } from 'lucide-react'
+import { Trophy, Gamepad2, Users, Zap, Shield, Award, DollarSign, Clock, Sparkles, Target, TrendingUp } from 'lucide-react'
 import { Navbar } from '@/components/navbar'
 import { SlotsCounter } from '@/components/slots-counter'
 import { useStats } from '@/hooks/useStats'
@@ -13,6 +14,66 @@ import { ParticlesBackground } from '@/components/particles-background'
 import { TypingAnimation } from '@/components/typing-animation'
 import { TiltCard } from '@/components/tilt-card'
 import { useInView } from 'react-intersection-observer'
+import { Fade, Slide, Bounce, Zoom } from 'react-awesome-reveal'
+
+// Dynamically import GSAP only on client side to avoid SSR issues
+const useGSAP = () => {
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    
+    // Import GSAP dynamically
+    import('gsap').then((gsapModule) => {
+      import('gsap/dist/ScrollTrigger').then((ScrollTriggerModule) => {
+        const gsap = gsapModule.default
+        const ScrollTrigger = ScrollTriggerModule.default
+        gsap.registerPlugin(ScrollTrigger)
+        
+        // Your GSAP animations here
+        const statsCards = document.querySelectorAll('.stat-card')
+        if (statsCards.length > 0) {
+          gsap.fromTo(
+            statsCards,
+            { opacity: 0, y: 50, rotateX: -15 },
+            {
+              opacity: 1,
+              y: 0,
+              rotateX: 0,
+              duration: 0.8,
+              stagger: 0.2,
+              ease: 'power3.out',
+              scrollTrigger: {
+                trigger: '.stat-card',
+                start: 'top 80%',
+                toggleActions: 'play none none none',
+              },
+            }
+          )
+        }
+        
+        const featureCards = document.querySelectorAll('.feature-card')
+        if (featureCards.length > 0) {
+          gsap.fromTo(
+            featureCards,
+            { opacity: 0, scale: 0.8, rotation: -5 },
+            {
+              opacity: 1,
+              scale: 1,
+              rotation: 0,
+              duration: 0.6,
+              stagger: 0.15,
+              ease: 'back.out(1.7)',
+              scrollTrigger: {
+                trigger: '.feature-card',
+                start: 'top 85%',
+                toggleActions: 'play none none none',
+              },
+            }
+          )
+        }
+      })
+    })
+  }, [])
+}
 
 export default function HomePage() {
   const { data: stats } = useStats()
@@ -22,6 +83,9 @@ export default function HomePage() {
   const totalTeams = (stats?.pubgTeams || 0) + (stats?.freeFireTeams || 0)
   const totalRevenue = totalTeams * 80
   const totalPlayers = totalTeams * 4
+
+  // Use GSAP animations
+  useGSAP()
 
   return (
     <TooltipProvider>
@@ -83,59 +147,98 @@ export default function HomePage() {
           </motion.div>
 
           {/* Stats Overview */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: heroInView ? 1 : 0, y: heroInView ? 0 : 20 }}
-            transition={{ delay: 0.7 }}
+          <div
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-4xl mx-auto mb-8 sm:mb-16"
           >
             {[
-              { icon: Users, value: totalTeams, label: 'Teams Registered', color: 'blue', delay: 0 },
-              { icon: Trophy, value: totalPlayers, label: 'Total Players', color: 'yellow', delay: 0.1 },
-              { icon: DollarSign, value: formatCurrency(totalRevenue), label: 'Prize Pool', color: 'green', delay: 0.2, isCurrency: true },
+              { icon: Users, value: totalTeams, label: 'Teams Registered', color: 'blue', gradient: 'from-blue-500 to-cyan-500', delay: 0 },
+              { icon: Trophy, value: totalPlayers, label: 'Total Players', color: 'yellow', gradient: 'from-yellow-500 to-orange-500', delay: 0.1 },
+              { icon: DollarSign, value: formatCurrency(totalRevenue), label: 'Prize Pool', color: 'green', gradient: 'from-green-500 to-emerald-500', delay: 0.2, isCurrency: true },
             ].map((stat, index) => (
               <motion.div
                 key={index}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: heroInView ? 1 : 0, scale: heroInView ? 1 : 0.8 }}
-                transition={{ delay: 0.8 + stat.delay }}
-                whileHover={{ scale: 1.05, y: -5 }}
-                className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-4 sm:p-6 hover:bg-white/10 transition-all group relative overflow-hidden"
+                className="stat-card relative group"
+                whileHover={{ scale: 1.05, y: -8 }}
+                transition={{ type: 'spring', stiffness: 300 }}
               >
-                {/* Glowing Effect */}
-                <motion.div
-                  className={`absolute inset-0 bg-gradient-to-r from-${stat.color}-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity`}
-                  animate={{
-                    x: ['-100%', '100%'],
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: 'linear',
-                  }}
-                />
-                
-                <motion.div
-                  animate={{
-                    rotate: [0, 5, 0, -5, 0],
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    ease: 'easeInOut',
-                  }}
-                >
-                  <stat.icon className={`w-10 h-10 sm:w-12 sm:h-12 text-${stat.color}-500 mx-auto mb-2 sm:mb-3 group-hover:scale-110 transition-transform`} />
-                </motion.div>
-                {stat.isCurrency ? (
-                  <p className="text-2xl sm:text-3xl font-bold text-white mb-1">{stat.value}</p>
-                ) : (
-                  <AnimatedCounter value={stat.value as number} className="text-2xl sm:text-3xl font-bold text-white mb-1" />
-                )}
-                <p className="text-sm sm:text-base text-gray-400">{stat.label}</p>
+                <div className="relative bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 overflow-hidden hover:bg-white/10 transition-all">
+                  {/* Animated Gradient Background */}
+                  <motion.div
+                    className={`absolute inset-0 bg-gradient-to-br ${stat.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}
+                    animate={{
+                      scale: [1, 1.2, 1],
+                      rotate: [0, 5, 0],
+                    }}
+                    transition={{
+                      duration: 4,
+                      repeat: Infinity,
+                      ease: 'easeInOut',
+                    }}
+                  />
+
+                  {/* Sparkle Effect */}
+                  <motion.div
+                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100"
+                    animate={{
+                      rotate: [0, 360],
+                      scale: [0.8, 1.2, 0.8],
+                    }}
+                    transition={{
+                      duration: 3,
+                      repeat: Infinity,
+                      ease: 'easeInOut',
+                    }}
+                  >
+                    <Sparkles className="w-5 h-5 text-yellow-400" />
+                  </motion.div>
+
+                  {/* Icon with 3D effect */}
+                  <Bounce delay={index * 200}>
+                    <motion.div
+                      className="relative"
+                      animate={{
+                        y: [0, -8, 0],
+                        rotate: [0, 5, -5, 0],
+                      }}
+                      transition={{
+                        duration: 3,
+                        repeat: Infinity,
+                        ease: 'easeInOut',
+                        delay: stat.delay,
+                      }}
+                    >
+                      <div className={`w-16 h-16 mx-auto mb-4 flex items-center justify-center rounded-xl bg-gradient-to-br ${stat.gradient} p-3 shadow-lg shadow-${stat.color}-500/50`}>
+                        <stat.icon className="w-full h-full text-white" />
+                      </div>
+                    </motion.div>
+                  </Bounce>
+
+                  {/* Value */}
+                  <Zoom delay={index * 250}>
+                    {stat.isCurrency ? (
+                      <p className="text-3xl sm:text-4xl font-bold text-white mb-2 tracking-tight">{stat.value}</p>
+                    ) : (
+                      <AnimatedCounter value={stat.value as number} className="text-3xl sm:text-4xl font-bold text-white mb-2 tracking-tight" />
+                    )}
+                  </Zoom>
+
+                  {/* Label */}
+                  <Fade delay={index * 300}>
+                    <p className="text-sm text-gray-400 font-medium">{stat.label}</p>
+                  </Fade>
+
+                  {/* Bottom accent line */}
+                  <motion.div
+                    className={`absolute bottom-0 left-0 h-1 bg-gradient-to-r ${stat.gradient}`}
+                    initial={{ width: '0%' }}
+                    whileInView={{ width: '100%' }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 1, delay: stat.delay }}
+                  />
+                </div>
               </motion.div>
             ))}
-          </motion.div>
+          </div>
         </div>
       </div>
 
@@ -336,23 +439,117 @@ export default function HomePage() {
 
       {/* Features Section */}
       <div className="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-8 sm:py-12 md:py-16">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 max-w-5xl mx-auto">
+        <Slide direction="up" triggerOnce>
+          <motion.h2
+            className="text-3xl sm:text-4xl md:text-5xl font-bold text-center mb-12 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 text-transparent bg-clip-text"
+            animate={{
+              backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
+            }}
+            transition={{
+              duration: 5,
+              repeat: Infinity,
+              ease: 'linear',
+            }}
+          >
+            Why Choose Us?
+          </motion.h2>
+        </Slide>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
           {[
-            { icon: Zap, text: 'Instant Registration', color: 'text-yellow-500', desc: 'Quick & easy sign-up process' },
-            { icon: Shield, text: 'Fair Play Guaranteed', color: 'text-blue-500', desc: 'Strict anti-cheat policies' },
-            { icon: Award, text: 'Cash Prizes', color: 'text-green-500', desc: 'Win real money rewards' },
+            {
+              icon: Zap,
+              text: 'Lightning Fast',
+              color: 'text-yellow-500',
+              gradient: 'from-yellow-500 to-orange-500',
+              desc: 'Instant registration & real-time updates',
+            },
+            {
+              icon: Shield,
+              text: '100% Secure',
+              color: 'text-blue-500',
+              gradient: 'from-blue-500 to-cyan-500',
+              desc: 'Your data is encrypted and protected',
+            },
+            {
+              icon: Award,
+              text: 'Cash Prizes',
+              color: 'text-green-500',
+              gradient: 'from-green-500 to-emerald-500',
+              desc: 'Win real money - paid within 24 hours',
+            },
+            {
+              icon: Target,
+              text: 'Fair Gameplay',
+              color: 'text-red-500',
+              gradient: 'from-red-500 to-pink-500',
+              desc: 'Strict anti-cheat & fair play policies',
+            },
+            {
+              icon: Users,
+              text: 'Active Community',
+              color: 'text-purple-500',
+              gradient: 'from-purple-500 to-pink-500',
+              desc: 'Join thousands of competitive players',
+            },
+            {
+              icon: TrendingUp,
+              text: 'Level Up',
+              color: 'text-indigo-500',
+              gradient: 'from-indigo-500 to-purple-500',
+              desc: 'Improve your skills in every match',
+            },
           ].map((feature, index) => (
             <motion.div
               key={index}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-              className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-4 sm:p-6 hover:bg-white/10 transition-all text-center"
+              className="feature-card group relative"
+              whileHover={{ y: -10, scale: 1.05 }}
+              transition={{ type: 'spring', stiffness: 300 }}
             >
-              <feature.icon className={`w-10 h-10 sm:w-12 sm:h-12 ${feature.color} mx-auto mb-2 sm:mb-3`} />
-              <p className="text-white font-semibold mb-1 sm:mb-2 text-sm sm:text-base">{feature.text}</p>
-              <p className="text-gray-400 text-xs sm:text-sm">{feature.desc}</p>
+              <div className="relative bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 overflow-hidden hover:bg-white/10 transition-all h-full">
+                {/* Animated background */}
+                <motion.div
+                  className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-10`}
+                  animate={{
+                    rotate: [0, 360],
+                  }}
+                  transition={{
+                    duration: 20,
+                    repeat: Infinity,
+                    ease: 'linear',
+                  }}
+                />
+
+                {/* Icon */}
+                <Bounce delay={index * 100} triggerOnce>
+                  <motion.div
+                    className={`w-14 h-14 mx-auto mb-4 flex items-center justify-center rounded-xl bg-gradient-to-br ${feature.gradient} p-3 shadow-lg`}
+                    whileHover={{ rotate: 360 }}
+                    transition={{ duration: 0.6 }}
+                  >
+                    <feature.icon className="w-full h-full text-white" />
+                  </motion.div>
+                </Bounce>
+
+                {/* Title */}
+                <Fade delay={index * 150} triggerOnce>
+                  <h3 className="text-white font-bold text-lg mb-2 text-center">{feature.text}</h3>
+                </Fade>
+
+                {/* Description */}
+                <Slide direction="up" delay={index * 200} triggerOnce>
+                  <p className="text-gray-400 text-sm text-center leading-relaxed">{feature.desc}</p>
+                </Slide>
+
+                {/* Accent line */}
+                <motion.div
+                  className={`absolute bottom-0 left-0 h-1 bg-gradient-to-r ${feature.gradient}`}
+                  initial={{ width: '0%' }}
+                  whileInView={{ width: '100%' }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8, delay: index * 0.1 }}
+                />
+              </div>
             </motion.div>
           ))}
         </div>

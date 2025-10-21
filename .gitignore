@@ -35,6 +35,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# data files (optional - remove if you want to include them)
-# /data
-# /exports
+# data folder (ephemeral on Vercel)
+/data/*.json
+
+# exports folder
+/exports

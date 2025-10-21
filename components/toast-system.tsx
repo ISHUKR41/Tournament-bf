@@ -1,8 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
 import { toast } from 'sonner'
-import { motion, AnimatePresence } from 'framer-motion'
 
 export function setupToastSystem() {
   // This is called from layout to setup global toast styling

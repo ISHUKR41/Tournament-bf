@@ -7,16 +7,11 @@ const nextConfig = {
     unoptimized: true,
   },
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: false,
   },
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
-  experimental: {
-    optimizeCss: true,
-  },
-  // Ensure proper build output
-  output: 'standalone',
 }
 
 module.exports = nextConfig

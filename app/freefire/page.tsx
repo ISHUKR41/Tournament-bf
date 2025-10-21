@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
-import Link from "next/link";
 import Image from "next/image";
 import toast from "react-hot-toast";
 import {
@@ -14,17 +13,14 @@ import {
   DollarSign,
   AlertCircle,
   CheckCircle,
-  Upload,
   Zap,
 } from "lucide-react";
 import { Navbar } from "@/components/navbar";
-import { SlotsCounter } from "@/components/slots-counter";
 import { useStats } from "@/hooks/useStats";
 import { SuccessConfetti } from "@/components/success-confetti";
-import { formatCurrency } from "@/lib/utils";
 
 export default function FreeFirePage() {
-  const { data: stats, isLoading: statsLoading } = useStats();
+  const { data: stats } = useStats();
   const [showConfetti, setShowConfetti] = useState(false);
   const [formData, setFormData] = useState({
     teamName: "",
@@ -108,7 +104,7 @@ export default function FreeFirePage() {
       } else {
         toast.error(data.error || "Registration failed");
       }
-    } catch (error) {
+    } catch {
       toast.error("Failed to register. Please try again.");
     } finally {
       setLoading(false);
@@ -536,9 +532,11 @@ export default function FreeFirePage() {
                     </div>
                     {imagePreview && (
                       <div className="mt-4">
-                        <img
+                        <Image
                           src={imagePreview}
                           alt="Payment Preview"
+                          width={300}
+                          height={300}
                           className="max-w-xs rounded-lg border border-white/20"
                         />
                       </div>
@@ -581,7 +579,7 @@ export default function FreeFirePage() {
                         name="liveStream"
                         value="yes"
                         checked={formData.liveStreamVote === "yes"}
-                        onChange={(e) =>
+                        onChange={() =>
                           setFormData({ ...formData, liveStreamVote: "yes" })
                         }
                         className="w-4 h-4 text-red-500"
@@ -594,7 +592,7 @@ export default function FreeFirePage() {
                         name="liveStream"
                         value="no"
                         checked={formData.liveStreamVote === "no"}
-                        onChange={(e) =>
+                        onChange={() =>
                           setFormData({ ...formData, liveStreamVote: "no" })
                         }
                         className="w-4 h-4 text-red-500"

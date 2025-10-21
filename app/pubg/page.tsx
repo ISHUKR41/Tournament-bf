@@ -13,7 +13,6 @@ import {
   DollarSign,
   AlertCircle,
   CheckCircle,
-  Upload,
   ArrowLeft,
   Gamepad2,
 } from "lucide-react";
@@ -52,7 +51,7 @@ export default function PUBGPage() {
       const res = await fetch("/api/stats");
       const data = await res.json();
       setStats({ pubgTeams: data.pubgTeams, pubgSlots: data.pubgSlots });
-    } catch (error) {
+    } catch {
       console.error("Failed to fetch stats");
     }
   };
@@ -120,7 +119,7 @@ export default function PUBGPage() {
       } else {
         setMessage({ type: "error", text: data.error });
       }
-    } catch (error) {
+    } catch {
       setMessage({
         type: "error",
         text: "Failed to register. Please try again.",
@@ -582,9 +581,11 @@ export default function PUBGPage() {
                     </div>
                     {imagePreview && (
                       <div className="mt-4">
-                        <img
+                        <Image
                           src={imagePreview}
                           alt="Payment Preview"
+                          width={300}
+                          height={300}
                           className="max-w-xs rounded-lg border border-white/20"
                         />
                       </div>
@@ -627,7 +628,7 @@ export default function PUBGPage() {
                         name="liveStream"
                         value="yes"
                         checked={formData.liveStreamVote === "yes"}
-                        onChange={(e) =>
+                        onChange={() =>
                           setFormData({ ...formData, liveStreamVote: "yes" })
                         }
                         className="w-4 h-4 text-orange-500"
@@ -640,7 +641,7 @@ export default function PUBGPage() {
                         name="liveStream"
                         value="no"
                         checked={formData.liveStreamVote === "no"}
-                        onChange={(e) =>
+                        onChange={() =>
                           setFormData({ ...formData, liveStreamVote: "no" })
                         }
                         className="w-4 h-4 text-orange-500"

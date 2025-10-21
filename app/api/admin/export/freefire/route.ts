@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
         'Content-Disposition': `attachment; filename=FreeFire_Teams_${new Date().toISOString().split('T')[0]}.xlsx`,
       },
     })
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to export data' },
       { status: 500 }

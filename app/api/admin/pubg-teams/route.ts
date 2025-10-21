@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
 
     const teams = getPUBGTeams()
     return NextResponse.json(teams)
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to fetch teams' },
       { status: 500 }
