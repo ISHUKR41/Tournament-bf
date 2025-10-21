@@ -352,7 +352,7 @@ export default function FreeFirePage() {
                         setFormData({ ...formData, leaderName: e.target.value })
                       }
                       className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-red-500 transition-colors"
-                      placeholder="Leader&apos;s full name"
+                      placeholder="Leader's full name"
                     />
                   </div>
                   <div>

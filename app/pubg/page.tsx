@@ -404,7 +404,7 @@ export default function PUBGPage() {
                         setFormData({ ...formData, leaderName: e.target.value })
                       }
                       className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/10 border border-white/20 rounded-lg sm:rounded-xl text-white text-sm sm:text-base placeholder-gray-400 focus:outline-none focus:border-orange-500 transition-colors"
-                      placeholder="Leader&apos;s full name"
+                      placeholder="Leader's full name"
                     />
                   </div>
                   <div>
